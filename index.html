@@ -1,313 +1,191 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Microtache by dieu donne</title>
-<style>
-  /* Reset & basics */
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0; padding: 0;
-    background: #f9fafc;
-  }
-  #app {
-    max-width: 900px;
-    margin: 40px auto 80px;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 3px 10px rgb(0 0 0 / 0.1);
-  }
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  #menu-toggle {
-    font-size: 30px;
-    cursor: pointer;
-    user-select: none;
-  }
-  h1 {
-    margin: 0;
-    font-weight: 700;
-    color: #0d47a1;
-  }
-  /* Site logo image */
-  #site-logo {
-    max-height: 60px;
-  }
-  /* Drawer */
-  #drawer {
-    position: fixed;
-    top: 0; left: -260px;
-    width: 260px;
-    height: 100vh;
-    background: #0d47a1;
-    color: white;
-    padding: 30px 20px;
-    transition: left 0.3s ease;
-    box-shadow: 3px 0 8px rgba(0,0,0,0.2);
-    z-index: 1000;
-  }
-  #drawer.open {
-    left: 0;
-  }
-  #drawer h2 {
-    margin-top: 0;
-    font-weight: 700;
-  }
-  #drawer ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 30px;
-  }
-  #drawer ul li {
-    margin-bottom: 20px;
-  }
-  #drawer ul li button {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px 0;
-    width: 100%;
-    text-align: left;
-  }
-  #drawer ul li button:hover {
-    text-decoration: underline;
-  }
-  /* Overlay behind drawer */
-  #overlay {
-    position: fixed;
-    top:0; left:0;
-    width:100vw; height:100vh;
-    background: rgba(0,0,0,0.3);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease;
-    z-index: 900;
-  }
-  #overlay.active {
-    opacity: 1;
-    visibility: visible;
-  }
-  /* Login/Register container */
-  #login-register {
-    max-width: 350px;
-    margin: 40px auto;
-  }
-  #login-register h2 {
-    color: #0d47a1;
-    text-align: center;
-  }
-  #login-register input {
-    width: 100%;
-    padding: 10px;
-    margin: 12px 0;
-    border: 1px solid #aaa;
-    border-radius: 5px;
-    font-size: 16px;
-  }
-  #login-register button {
-    width: 100%;
-    background: #0d47a1;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  #login-register button:hover {
-    background: #084a8a;
-  }
-  #login-register .switch {
-    text-align: center;
-    margin-top: 10px;
-    font-size: 14px;
-    color: #555;
-    cursor: pointer;
-  }
-  #login-register .switch:hover {
-    text-decoration: underline;
-  }
-  #login-msg {
-    color: red;
-    margin-top: 10px;
-    text-align: center;
-  }
-  /* Content area */
-  #main-content {
-    margin-top: 30px;
-  }
-  #content h2 {
-    color: #0d47a1;
-  }
-  /* Formation list buttons */
-  .formation-btn {
-    display: block;
-    margin: 10px 0;
-    padding: 12px 20px;
-    background: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    text-align: left;
-  }
-  .formation-btn:hover {
-    background: #0b4e94;
-  }
-  /* Modal */
-  #modal {
-    display: none;
-    position: fixed;
-    top:0; left:0;
-    width:100vw; height:100vh;
-    background: rgba(0,0,0,0.6);
-    justify-content: center;
-    align-items: center;
-    z-index: 1100;
-  }
-  #modal.active {
-    display: flex;
-  }
-  #modal .modal-content {
-    background: white;
-    border-radius: 12px;
-    padding: 25px 30px;
-    width: 320px;
-    text-align: center;
-    box-shadow: 0 5px 15px rgb(0 0 0 / 0.3);
-    position: relative;
-  }
-  #modal h3 {
-    margin-top: 0;
-    color: #0d47a1;
-  }
-  #modal .modal-text {
-    margin: 15px 0 20px 0;
-    font-size: 16px;
-  }
-  #modal .btn-profile, #modal .btn-close {
-    background: #0d47a1;
-    border: none;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 6px;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    margin: 5px 10px;
-  }
-  #modal .btn-profile:hover {
-    background: #084a8a;
-  }
-  #modal .btn-close {
-    background: #888;
-  }
-  #modal .btn-close:hover {
-    background: #555;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Microtache by dieu donne</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    header img {
+      max-height: 60px;
+    }
+    #menu-toggle {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      font-size: 30px;
+      color: white;
+      cursor: pointer;
+    }
+    #drawer {
+      width: 250px;
+      background-color: #003366;
+      color: white;
+      position: fixed;
+      top: 0;
+      left: -250px;
+      height: 100%;
+      overflow: auto;
+      transition: 0.3s;
+      padding-top: 60px;
+    }
+    #drawer a {
+      display: block;
+      padding: 16px;
+      text-decoration: none;
+      color: white;
+    }
+    #drawer a:hover {
+      background-color: #575757;
+    }
+    .container {
+      padding: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      z-index: 1000;
+      max-width: 300px;
+      text-align: center;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    button {
+      background-color: #00aaff;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0077aa;
+    }
+  </style>
 </head>
 <body>
 
-<!-- Drawer menu -->
-<div id="drawer" aria-hidden="true">
-  <h2>Menu</h2>
-  <ul>
-    <li><button onclick="showSection('formation')">Formation</button></li>
-    <li><button onclick="showSection('creation')">Création compte</button></li>
-    <li><button onclick="showSection('admis')">Admis</button></li>
-    <li><button onclick="logout()">Déconnexion</button></li>
-  </ul>
+<div id="menu-toggle">&#9776;</div>
+<div id="drawer">
+  <a href="#" onclick="showSection('formation')">Formation</a>
+  <a href="#" onclick="showSection('creation')">Creation compte</a>
+  <a href="#" onclick="showSection('admis')">Admis</a>
 </div>
-<div id="overlay" tabindex="-1"></div>
 
-<div id="app">
+<header>
+  <img src="https://via.placeholder.com/300x60?text=Microtache+by+dieu+donne" alt="Logo" />
+</header>
 
-  <header>
-    <div id="menu-toggle" aria-label="Ouvrir menu" role="button" tabindex="0">&#9776;</div>
-    <img id="site-logo" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=140&q=80" alt="Microtache by dieu donne" />
-  </header>
-
-  <!-- Login/Register -->
-  <div id="login-register">
-    <h2 id="form-title">Connexion</h2>
-    <input type="text" id="username" placeholder="Nom d'utilisateur" autocomplete="off" />
-    <input type="password" id="password" placeholder="Mot de passe" autocomplete="off" />
-    <button id="btn-login">Se connecter</button>
-    <div class="switch" id="switch-form">Pas encore de compte ? Inscrivez-vous</div>
-    <div id="login-msg"></div>
+<div class="container">
+  <div id="login">
+    <h2>Connexion</h2>
+    <input type="text" placeholder="Nom d'utilisateur" id="username" /><br />
+    <input type="password" placeholder="Mot de passe" id="password" /><br />
+    <button onclick="login()">Se connecter</button>
   </div>
 
-  <!-- Main content -->
-  <div id="main-content" style="display:none;">
-    <div id="content">
+  <div id="content" class="hidden">
+    <div id="formation" class="hidden">
+      <h3>Plateformes</h3>
+      <p><strong>Sproutsgigs</strong> - Une plateforme de microtaches moderne.</p>
+      <button onclick="showPopup('Sproutsgigs', 'https://www.mediafire.com/file/hx2o2486w66seo6/Sprouts_saison_1.zip/file')">Accéder</button>
 
-      <!-- Formation -->
-      <section id="formation" style="display:none;">
-        <h2>Formations disponibles</h2>
-        <p>Découvrez nos plateformes de formation sélectionnées :</p>
-        <ul>
-          <li><strong>Sproutsgigs :</strong> Apprenez et gagnez avec cette plateforme dynamique.</li>
-          <li><strong>Timebucks :</strong> Multipliez vos revenus en ligne facilement.</li>
-          <li><strong>Outlier :</strong> Devenez un expert avec nos formations de pointe.</li>
-        </ul>
-        <button class="formation-btn" data-name="Sproutsgigs" data-link="https://www.mediafire.com/file/hx2o2486w66seo6/Sprouts_saison_1.zip/file">Sproutsgigs</button>
-        <button class="formation-btn" data-name="Timebucks" data-link="https://www.mediafire.com/file/yz36nioz1aj3x0i/timebucks.zip/file">Timebucks</button>
-        <button class="formation-btn" data-name="Outlier" data-link="https://www.mediafire.com/file/za1j1vgr10wxuew/Outlier.zip/file">Outlier</button>
-      </section>
+      <p><strong>Timebucks</strong> - Gagnez de l'argent en ligne.</p>
+      <button onclick="showPopup('Timebucks', 'https://www.mediafire.com/file/yz36nioz1aj3x0i/timebucks.zip/file')">Accéder</button>
 
-      <!-- Création compte -->
-      <section id="creation" style="display:none;">
-        <h2>Création de compte</h2>
-        <p>Vous pouvez créer un nouveau compte ici :</p>
-        <input type="text" id="new-username" placeholder="Nom d'utilisateur" autocomplete="off" />
-        <input type="password" id="new-password" placeholder="Mot de passe" autocomplete="off" />
-        <button id="btn-register">Créer un compte</button>
-        <div id="register-msg" style="color:red; margin-top:10px;"></div>
-      </section>
+      <p><strong>Outlier</strong> - Plateforme de formation avancée.</p>
+      <button onclick="showPopup('Outlier', 'https://www.mediafire.com/file/za1j1vgr10wxuew/Outlier.zip/file')">Accéder</button>
+    </div>
 
-      <!-- Admis -->
-      <section id="admis" style="display:none;">
-        <h2>Admis</h2>
-        <p>Le code de votre plateforme est disponible ici.</p>
-        <p>Pour une autre formation ou une présentation, contactez <a href="https://www.facebook.com/microtache.mada.2025" target="_blank" rel="noopener">Mr dieu donne</a>.</p>
-      </section>
+    <div id="creation" class="hidden">
+      <h3>Création de compte</h3>
+      <p>Veuillez contacter Mr Dieu Donne pour créer un compte personnalisé.</p>
+    </div>
 
+    <div id="admis" class="hidden">
+      <h3>Admis</h3>
+      <p>Le code d'accès de votre plateforme est ici. Si vous voulez une autre formation ou une présentation :</p>
+      <a href="https://www.facebook.com/microtache.mada.2025" target="_blank">Mr Dieu Donne</a>
     </div>
   </div>
 </div>
 
-<!-- Modal -->
-<div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
-  <div class="modal-content">
-    <h3 id="modal-title">Information importante</h3>
-    <p id="modal-desc" class="modal-text"></p>
-    <button class="btn-profile">Contacter Mr dieu donne</button>
-    <button class="btn-close">Fermer</button>
-  </div>
+<!-- Popup -->
+<div id="popup" class="popup hidden">
+  <p>Le code de votre plateforme est dans l'onglet Admis.<br>Pour en obtenir un autre, contactez Mr Dieu Donne.</p>
+  <a id="fb-link" href="#" target="_blank"><button>Contacter</button></a>
+  <br>
+  <a id="mediafire-link" href="#" target="_blank"><button>Télécharger</button></a>
 </div>
+<div id="overlay" class="overlay hidden" onclick="closePopup()"></div>
 
 <script>
-  // Éléments DOM
   const drawer = document.getElementById('drawer');
-  const overlay = document.getElementById('overlay');
   const menuToggle = document.getElementById('menu-toggle');
-  const loginRegister = document.getElementById('login-register');
-  const mainContent = document.getElementById('main-content');
-  const sections = {
-    formation: document.getElementById('formation'),
-    creation: document.getElementById('creation'),
-    admis: document.getElementById('admis')
- 
+  const loginDiv = document.getElementById('login');
+  const contentDiv = document.getElementById('content');
+
+  menuToggle.onclick = () => {
+    drawer.style.left = drawer.style.left === '0px' ? '-250px' : '0px';
+  };
+
+  function login() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    if(user && pass) {
+      loginDiv.classList.add('hidden');
+      contentDiv.classList.remove('hidden');
+      showSection('formation');
+    } else {
+      alert("Veuillez entrer vos identifiants.");
+    }
+  }
+
+  function showSection(id) {
+    document.querySelectorAll('#content > div').forEach(div => div.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    drawer.style.left = '-250px';
+  }
+
+  function showPopup(name, link) {
+    document.getElementById('popup').classList.remove('hidden');
+    document.getElementById('overlay').classList.remove('hidden');
+    document.getElementById('fb-link').href = "https://www.facebook.com/microtache.mada.2025";
+    document.getElementById('mediafire-link').href = link;
+  }
+
+  function closePopup() {
+    document.getElementById('popup').classList.add('hidden');
+    document.getElementById('overlay').classList.add('hidden');
+  }
+</script>
+
+</body>
+</html>
