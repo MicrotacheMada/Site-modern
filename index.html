@@ -1,118 +1,312 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Connexion Paiement</title>
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-  <script>
-    (function(){
-      emailjs.init('YYrFopYHhhKB8HIBv'); // Clé publique EmailJS
-    })();
-  </script>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
-    .container { max-width: 400px; margin: 50px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    .hidden { display: none; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
-    .modal-content { background: white; padding: 20px; border-radius: 10px; max-width: 400px; text-align: center; }
-    .spinner { border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 10px auto; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Microtache by dieu donne</title>
+<style>
+  /* Reset & basics */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 0;
+    background: #f9fafc;
+  }
+  #app {
+    max-width: 900px;
+    margin: 40px auto 80px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.1);
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  #menu-toggle {
+    font-size: 30px;
+    cursor: pointer;
+    user-select: none;
+  }
+  h1 {
+    margin: 0;
+    font-weight: 700;
+    color: #0d47a1;
+  }
+  /* Site logo image */
+  #site-logo {
+    max-height: 60px;
+  }
+  /* Drawer */
+  #drawer {
+    position: fixed;
+    top: 0; left: -260px;
+    width: 260px;
+    height: 100vh;
+    background: #0d47a1;
+    color: white;
+    padding: 30px 20px;
+    transition: left 0.3s ease;
+    box-shadow: 3px 0 8px rgba(0,0,0,0.2);
+    z-index: 1000;
+  }
+  #drawer.open {
+    left: 0;
+  }
+  #drawer h2 {
+    margin-top: 0;
+    font-weight: 700;
+  }
+  #drawer ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 30px;
+  }
+  #drawer ul li {
+    margin-bottom: 20px;
+  }
+  #drawer ul li button {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 0;
+    width: 100%;
+    text-align: left;
+  }
+  #drawer ul li button:hover {
+    text-decoration: underline;
+  }
+  /* Overlay behind drawer */
+  #overlay {
+    position: fixed;
+    top:0; left:0;
+    width:100vw; height:100vh;
+    background: rgba(0,0,0,0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    z-index: 900;
+  }
+  #overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  /* Login/Register container */
+  #login-register {
+    max-width: 350px;
+    margin: 40px auto;
+  }
+  #login-register h2 {
+    color: #0d47a1;
+    text-align: center;
+  }
+  #login-register input {
+    width: 100%;
+    padding: 10px;
+    margin: 12px 0;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  #login-register button {
+    width: 100%;
+    background: #0d47a1;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  #login-register button:hover {
+    background: #084a8a;
+  }
+  #login-register .switch {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+  }
+  #login-register .switch:hover {
+    text-decoration: underline;
+  }
+  #login-msg {
+    color: red;
+    margin-top: 10px;
+    text-align: center;
+  }
+  /* Content area */
+  #main-content {
+    margin-top: 30px;
+  }
+  #content h2 {
+    color: #0d47a1;
+  }
+  /* Formation list buttons */
+  .formation-btn {
+    display: block;
+    margin: 10px 0;
+    padding: 12px 20px;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: left;
+  }
+  .formation-btn:hover {
+    background: #0b4e94;
+  }
+  /* Modal */
+  #modal {
+    display: none;
+    position: fixed;
+    top:0; left:0;
+    width:100vw; height:100vh;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+  }
+  #modal.active {
+    display: flex;
+  }
+  #modal .modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 25px 30px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgb(0 0 0 / 0.3);
+    position: relative;
+  }
+  #modal h3 {
+    margin-top: 0;
+    color: #0d47a1;
+  }
+  #modal .modal-text {
+    margin: 15px 0 20px 0;
+    font-size: 16px;
+  }
+  #modal .btn-profile, #modal .btn-close {
+    background: #0d47a1;
+    border: none;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 5px 10px;
+  }
+  #modal .btn-profile:hover {
+    background: #084a8a;
+  }
+  #modal .btn-close {
+    background: #888;
+  }
+  #modal .btn-close:hover {
+    background: #555;
+  }
+</style>
 </head>
 <body>
-  <div class="container" id="loginRegister">
-    <h2>Connexion ou Inscription</h2>
-    <input type="text" id="username" placeholder="Nom d'utilisateur" style="width:100%; padding:8px; margin-bottom:10px" />
-    <button onclick="login()" style="width:100%; padding:10px;">Entrer</button>
+
+<!-- Drawer menu -->
+<div id="drawer" aria-hidden="true">
+  <h2>Menu</h2>
+  <ul>
+    <li><button onclick="showSection('formation')">Formation</button></li>
+    <li><button onclick="showSection('creation')">Création compte</button></li>
+    <li><button onclick="showSection('admis')">Admis</button></li>
+    <li><button onclick="logout()">Déconnexion</button></li>
+  </ul>
+</div>
+<div id="overlay" tabindex="-1"></div>
+
+<div id="app">
+
+  <header>
+    <div id="menu-toggle" aria-label="Ouvrir menu" role="button" tabindex="0">&#9776;</div>
+    <img id="site-logo" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=140&q=80" alt="Microtache by dieu donne" />
+  </header>
+
+  <!-- Login/Register -->
+  <div id="login-register">
+    <h2 id="form-title">Connexion</h2>
+    <input type="text" id="username" placeholder="Nom d'utilisateur" autocomplete="off" />
+    <input type="password" id="password" placeholder="Mot de passe" autocomplete="off" />
+    <button id="btn-login">Se connecter</button>
+    <div class="switch" id="switch-form">Pas encore de compte ? Inscrivez-vous</div>
+    <div id="login-msg"></div>
   </div>
 
-  <div class="container hidden" id="mainSite">
-    <h2>Bienvenue <span id="userDisplay"></span></h2>
-    <button onclick="ouvrirPaiement('Timebucks')">Payer pour Timebucks</button>
-    <button onclick="ouvrirPaiement('Sproutsgigs')">Payer pour Sproutsgigs</button>
-    <button onclick="ouvrirPaiement('Outlier')">Payer pour Outlier</button>
-  </div>
+  <!-- Main content -->
+  <div id="main-content" style="display:none;">
+    <div id="content">
 
-  <!-- Modal paiement -->
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <h3>Paiement pour <span id="nomFormationModal"></span></h3>
-      <input type="number" id="montant" placeholder="Entrer le montant" style="width:100%; padding:8px; margin:10px 0" />
-      <button onclick="validerPaiement()">Valider</button>
+      <!-- Formation -->
+      <section id="formation" style="display:none;">
+        <h2>Formations disponibles</h2>
+        <p>Découvrez nos plateformes de formation sélectionnées :</p>
+        <ul>
+          <li><strong>Sproutsgigs :</strong> Apprenez et gagnez avec cette plateforme dynamique.</li>
+          <li><strong>Timebucks :</strong> Multipliez vos revenus en ligne facilement.</li>
+          <li><strong>Outlier :</strong> Devenez un expert avec nos formations de pointe.</li>
+        </ul>
+        <button class="formation-btn" data-name="Sproutsgigs" data-link="https://www.mediafire.com/file/hx2o2486w66seo6/Sprouts_saison_1.zip/file">Sproutsgigs</button>
+        <button class="formation-btn" data-name="Timebucks" data-link="https://www.mediafire.com/file/yz36nioz1aj3x0i/timebucks.zip/file">Timebucks</button>
+        <button class="formation-btn" data-name="Outlier" data-link="https://www.mediafire.com/file/za1j1vgr10wxuew/Outlier.zip/file">Outlier</button>
+      </section>
 
-      <div id="confirmationZone" class="hidden">
-        <p><strong>Envoyer à :</strong> Mr Dieu Donné</p>
-        <p>Numéro : 0338267761</p>
-        <label><input type="checkbox" id="lasaTompoko" /> lasa tompoko</label>
-        <button onclick="confirmerPaiement()" style="margin-top:10px; background:#00bfff; color:white; padding:10px;">Serial Blood</button>
-      </div>
+      <!-- Création compte -->
+      <section id="creation" style="display:none;">
+        <h2>Création de compte</h2>
+        <p>Vous pouvez créer un nouveau compte ici :</p>
+        <input type="text" id="new-username" placeholder="Nom d'utilisateur" autocomplete="off" />
+        <input type="password" id="new-password" placeholder="Mot de passe" autocomplete="off" />
+        <button id="btn-register">Créer un compte</button>
+        <div id="register-msg" style="color:red; margin-top:10px;"></div>
+      </section>
 
-      <button onclick="fermerModal()" style="margin-top:10px;">Annuler</button>
+      <!-- Admis -->
+      <section id="admis" style="display:none;">
+        <h2>Admis</h2>
+        <p>Le code de votre plateforme est disponible ici.</p>
+        <p>Pour une autre formation ou une présentation, contactez <a href="https://www.facebook.com/microtache.mada.2025" target="_blank" rel="noopener">Mr dieu donne</a>.</p>
+      </section>
+
     </div>
   </div>
+</div>
 
-  <script>
-    let utilisateurConnecte = "";
-    let formationActuelle = "";
+<!-- Modal -->
+<div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
+  <div class="modal-content">
+    <h3 id="modal-title">Information importante</h3>
+    <p id="modal-desc" class="modal-text"></p>
+    <button class="btn-profile">Contacter Mr dieu donne</button>
+    <button class="btn-close">Fermer</button>
+  </div>
+</div>
 
-    function login() {
-      const user = document.getElementById("username").value;
-      if (!user) return alert("Veuillez entrer votre nom d'utilisateur");
-      utilisateurConnecte = user;
-      document.getElementById("userDisplay").textContent = user;
-      document.getElementById("loginRegister").classList.add("hidden");
-      document.getElementById("mainSite").classList.remove("hidden");
-    }
-
-    function ouvrirPaiement(nomFormation) {
-      formationActuelle = nomFormation;
-      document.getElementById("nomFormationModal").textContent = nomFormation;
-      document.getElementById("montant").value = "";
-      document.getElementById("confirmationZone").classList.add("hidden");
-      document.getElementById("modal").style.display = "flex";
-    }
-
-    function fermerModal() {
-      document.getElementById("modal").style.display = "none";
-    }
-
-    function validerPaiement() {
-      const montant = document.getElementById("montant").value;
-      if (!montant || montant <= 0) {
-        alert("Veuillez entrer un montant valide.");
-        return;
-      }
-      document.getElementById("confirmationZone").classList.remove("hidden");
-    }
-
-    function confirmerPaiement() {
-      const check = document.getElementById("lasaTompoko").checked;
-      if (!check) return alert("Veuillez cocher 'lasa tompoko'");
-
-      const montant = document.getElementById("montant").value;
-
-      emailjs.send("service_i7jtllp", "template_zn3aqz9", {
-        nom_utilisateur: utilisateurConnecte,
-        formation: formationActuelle,
-        montant: montant
-      })
-      .then(() => console.log("Email envoyé"))
-      .catch((e) => console.error("Erreur EmailJS:", e));
-
-      const modalContent = document.querySelector("#modal .modal-content");
-      modalContent.innerHTML = `
-        <div>
-          <div class="spinner"></div>
-          <p>Génération de code pour <strong>${formationActuelle}</strong> sur la plateforme Airtel Money...</p>
-        </div>
-      `;
-
-      setTimeout(() => {
-        alert("Code généré avec succès ! Merci pour votre paiement.");
-        location.reload();
-      }, 3000);
-    }
-  </script>
-</body>
-</html>
+<script>
+  // Éléments DOM
+  const drawer = document.getElementById('drawer');
+  const overlay = document.getElementById('overlay');
+  const menuToggle = document.getElementById('menu-toggle');
+  const loginRegister = document.getElementById('login-register');
+  const mainContent = document.getElementById('main-content');
+  const sections = {
+    formation: document.getElementById('formation'),
+    creation: document.getElementById('creation'),
+    admis: document.getElementById('admis')
