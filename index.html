@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion Paiement</title>
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init('YYrFopYHhhKB8HIBv'); // Clé publique EmailJS
+    })();
+  </script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; }
+    .container { max-width: 400px; margin: 50px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .hidden { display: none; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 20px; border-radius: 10px; max-width: 400px; text-align: center; }
+    .spinner { border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 10px auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="container" id="loginRegister">
+    <h2>Connexion ou Inscription</h2>
+    <input type="text" id="username" placeholder="Nom d'utilisateur" style="width:100%; padding:8px; margin-bottom:10px" />
+    <button onclick="login()" style="width:100%; padding:10px;">Entrer</button>
+  </div>
+
+  <div class="container hidden" id="mainSite">
+    <h2>Bienvenue <span id="userDisplay"></span></h2>
+    <button onclick="ouvrirPaiement('Timebucks')">Payer pour Timebucks</button>
+    <button onclick="ouvrirPaiement('Sproutsgigs')">Payer pour Sproutsgigs</button>
+    <button onclick="ouvrirPaiement('Outlier')">Payer pour Outlier</button>
+  </div>
+
+  <!-- Modal paiement -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h3>Paiement pour <span id="nomFormationModal"></span></h3>
+      <input type="number" id="montant" placeholder="Entrer le montant" style="width:100%; padding:8px; margin:10px 0" />
+      <button onclick="validerPaiement()">Valider</button>
+
+      <div id="confirmationZone" class="hidden">
+        <p><strong>Envoyer à :</strong> Mr Dieu Donné</p>
+        <p>Numéro : 0338267761</p>
+        <label><input type="checkbox" id="lasaTompoko" /> lasa tompoko</label>
+        <button onclick="confirmerPaiement()" style="margin-top:10px; background:#00bfff; color:white; padding:10px;">Serial Blood</button>
+      </div>
+
+      <button onclick="fermerModal()" style="margin-top:10px;">Annuler</button>
+    </div>
+  </div>
+
+  <script>
+    let utilisateurConnecte = "";
+    let formationActuelle = "";
+
+    function login() {
+      const user = document.getElementById("username").value;
+      if (!user) return alert("Veuillez entrer votre nom d'utilisateur");
+      utilisateurConnecte = user;
+      document.getElementById("userDisplay").textContent = user;
+      document.getElementById("loginRegister").classList.add("hidden");
+      document.getElementById("mainSite").classList.remove("hidden");
+    }
+
+    function ouvrirPaiement(nomFormation) {
+      formationActuelle = nomFormation;
+      document.getElementById("nomFormationModal").textContent = nomFormation;
+      document.getElementById("montant").value = "";
+      document.getElementById("confirmationZone").classList.add("hidden");
+      document.getElementById("modal").style.display = "flex";
+    }
+
+    function fermerModal() {
+      document.getElementById("modal").style.display = "none";
+    }
+
+    function validerPaiement() {
+      const montant = document.getElementById("montant").value;
+      if (!montant || montant <= 0) {
+        alert("Veuillez entrer un montant valide.");
+        return;
+      }
+      document.getElementById("confirmationZone").classList.remove("hidden");
+    }
+
+    function confirmerPaiement() {
+      const check = document.getElementById("lasaTompoko").checked;
+      if (!check) return alert("Veuillez cocher 'lasa tompoko'");
+
+      const montant = document.getElementById("montant").value;
+
+      emailjs.send("service_i7jtllp", "template_zn3aqz9", {
+        nom_utilisateur: utilisateurConnecte,
+        formation: formationActuelle,
+        montant: montant
+      })
+      .then(() => console.log("Email envoyé"))
+      .catch((e) => console.error("Erreur EmailJS:", e));
+
+      const modalContent = document.querySelector("#modal .modal-content");
+      modalContent.innerHTML = `
+        <div>
+          <div class="spinner"></div>
+          <p>Génération de code pour <strong>${formationActuelle}</strong> sur la plateforme Airtel Money...</p>
+        </div>
+      `;
+
+      setTimeout(() => {
+        alert("Code généré avec succès ! Merci pour votre paiement.");
+        location.reload();
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
