@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Site Moderne - Paiement Airtel Money</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f4f9;
+    }
+    header {
+      background: #1e1e2f;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+    }
+    .drawer-toggle {
+      font-size: 2rem;
+      cursor: pointer;
+    }
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: #2c2c3c;
+      color: white;
+      padding: 2rem;
+      transition: left 0.3s;
+      z-index: 10;
+    }
+    .drawer.open {
+      left: 0;
+    }
+    .drawer a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 1rem 0;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+    section {
+      max-width: 600px;
+      background: white;
+      margin: 2rem auto;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      background: #1e1e2f;
+      color: white;
+      border: none;
+      padding: 0.7rem;
+      width: 100%;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top:0; left:0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      padding: 1.5rem;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .modal-content button {
+      background: #00bfff;
+      color: white;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    a.link-ussd {
+      display: inline-block;
+      margin-top: 1rem;
+      color: #0077cc;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Mon Site</h1>
+  <span class="drawer-toggle" onclick="toggleDrawer()">&#9776;</span>
+</header>
+
+<nav class="drawer" id="drawer">
+  <a onclick="afficherSection('formation')">Formation</a>
+  <a onclick="afficherSection('inscription')">Création Compte</a>
+  <a onclick="afficherSection('admis')">Admis</a>
+  <a onclick="afficherSection('admin')">Admin</a>
+</nav>
+
+<section id="inscription">
+  <h2>Inscription</h2>
+  <input type="text" id="nom" placeholder="Nom complet" />
+  <input type="email" id="email" placeholder="Adresse email" />
+  <input type="password" id="motdepasse" placeholder="Mot de passe" />
+  <button onclick="soumettreInscription()">S'inscrire</button>
+</section>
+
+<section id="accueil" class="hidden">
+  <h2>Bienvenue sur notre blog</h2>
+  <p>Ici vous trouverez toutes les informations utiles et actualités concernant nos formations et nos services.</p>
+</section>
+
+<section id="formation" class="hidden">
+  <h2>Ressources de Formation</h2>
+  <ul>
+    <li><a onclick="ouvrirPaiement('Sproutsgigs')">Sproutsgigs</a></li>
+    <li><a onclick="ouvrirPaiement('Timebucks')">Timebucks</a></li>
+    <li><a onclick="ouvrirPaiement('Outlier')">Outlier</a></li>
+  </ul>
+</section>
+
+<section id="admis" class="hidden">
+  <h2>Informations sur l'admission</h2>
+  <p>Les résultats d'admission sont disponibles dans cette section.</p>
+  <p>Si vous souhaitez une autre formation ou une présentation personnalisée, veuillez contacter :</p>
+  <p><a href="https://www.facebook.com/microtache.mada.2025" target="_blank">Mr Dieu Donné</a></p>
+</section>
+
+<section id="admin" class="hidden">
+  <h2>Espace Admin</h2>
+  <input type="text" id="cleFormation" placeholder="Nom de la formation (Sproutsgigs, Timebucks, Outlier)" />
+  <input type="text" id="cleCode" placeholder="Code ou ID de confirmation" />
+  <button onclick="ajouterCode()">Valider Paiement</button>
+
+  <h3>Liste des codes de confirmation</h3>
+  <ul id="listeCodes"></ul>
+</section>
+
+<!-- Modal paiement -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>Paiement pour la formation <span id="nomFormationModal"></span></h3>
+    <p>Veuillez effectuer le paiement à <strong>Mr Dieu Donné</strong> via Airtel Money.</p>
+
+    <label for="montant">Montant à payer :</label>
+    <input type="number" id="montant" placeholder="Entrer le montant" min="1" />
+
+    <button onclick="genererUSSD()">Payer via Airtel Money</button>
+    <p>Après paiement, entrez le code de confirmation reçu de l'admin.</p>
+    <button onclick="fermerModal()" style="margin-top:0.5rem; background:#888;">Annuler</button>
+  </div>
+</div>
+
+<script>
+  let drawerOpen = false;
+  const liens = {
+    "Sproutsgigs": "https://www.mediafire.com/file/hx2o2486w66seo6/Sprouts_saison_1.zip/file",
+    "Timebucks": "https://www.mediafire.com/file/yz36nioz1aj3x0i/timebucks.zip/file",
+    "Outlier": "https://www.mediafire.com/file/za1j1vgr10wxuew/Outlier.zip/file"
+  };
+  const confirmations = {};
+  const numeroAirtel = "0338267761"; // Mr Dieu Donné
+
+  function toggleDrawer() {
+    drawerOpen = !drawerOpen;
+    document.getElementById('drawer').classList.toggle('open', drawerOpen);
+  }
+
+  function soumettreInscription() {
+    const nom = document.getElementById('nom').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const motdepasse = document.getElementById('motdepasse').value.trim();
+    if (!nom || !email || !motdepasse) {
+      alert("Veuillez remplir tous les champs.");
+      return;
+    }
+    alert("Inscription réussie !");
+    afficherSection('accueil');
+  }
+
+  function afficherSection(id) {
+    ["inscription", "accueil", "formation", "admis", "admin"].forEach(section => {
+      document.getElementById(section).classList.add('hidden');
+    });
+    document.getElementById(id).classList.remove('hidden');
+    drawerOpen = false;
+    document.getElementById('drawer').classList.remove('open');
+  }
+
+  let formationDemandee = "";
+
+  function ouvrirPaiement(formation) {
+    formationDemandee = formation;
+    document.getElementById('nomFormationModal').textContent = formation;
+    document.getElementById('montant').value = "";
+    document.getElementById('modal').style.display = 'flex';
+  }
+
+  function fermerModal() {
+    document.getElementById('modal').style.display = 'none';
+  }
+
+  function genererUSSD() {
+    const montant = document.getElementById('montant').value.trim();
+    if (!montant || isNaN(montant) || montant <= 0) {
+      alert("Veuillez entrer un montant valide.");
+      return;
+    }
+    // Code USSD Airtel Money exemple : *126*Numéro*Montant#
+    // Le '#' doit être encodé en %23
+    const ussd = `*126*${numeroAirtel}*${montant}%23`;
+
+    // Créer un lien tel: ussd
+    const telLink = `tel:${encodeURIComponent(ussd)}`;
+
+    // Ouvre le lien (demande à l'app téléphone de s'ouvrir)
+    window.location.href = telLink;
+
+    alert("Après paiement, veuillez demander un code de confirmation à l'admin.");
+    fermerModal();
+  }
+
+  function ajouterCode() {
+    const formation = document.getElementById('cleFormation').value.trim();
+    const code = document.getElementById('cleCode').value.trim();
+    if (!formation || !code) {
+      alert("Veuillez remplir les deux champs.");
+      return;
+    }
+    confirmations[formation] = code;
+    alert(`Code ajouté pour la formation ${formation}`);
+    document.getElementById('cleFormation').value = "";
+    document.getElementById('cleCode').value = "";
+    miseAJourListeCodes();
+  }
+
+  function miseAJourListeCodes() {
+    const ul = document.getElementById('listeCodes');
+    ul.innerHTML = "";
+    for (const f in confirmations) {
+      const li = document.createElement('li');
+      li.textContent = `${f} : ${confirmations[f]}`;
+      ul.appendChild(li);
+    }
+  }
+
+  // Lorsque l'utilisateur entre un code de confirmation (on demande via prompt)
+  function verifierCodeConfirmation() {
+    if (!formationDemandee) return false;
+    const code = prompt("Entrez votre code de confirmation donné par l'admin :");
+    if (confirmations[formationDemandee] && confirmations[formationDemandee] === code) {
+      window.open(liens[formationDemandee], "_blank");
+      alert("Paiement validé ! Bon téléchargement.");
+      return true;
+    } else {
+      alert("Code invalide ou paiement non validé.");
+      return false;
+    }
+  }
+
+  // On ajoute un écouteur pour le lien dans la liste de formations
+  document.querySelectorAll('#formation a').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      ouvrirPaiement(e.target.textContent);
+    });
+  });
+
+  // On intercepte la validation paiement (après ouverture modal)
+  // Ici la validation se fait après paiement (code)
+  document.querySelector('#modal button').addEventListener('click', genererUSSD);
+
+  // Appel manuel du prompt de confirmation après paiement (exemple ici on peut rajouter un bouton)
+</script>
+
+</body>
+</html>
